@@ -111,6 +111,27 @@ services:
     networks:
       - traefik_proxy
 
+  kanboard:
+    container_name: kanboard
+    image: kanboard/kanboard:latest
+    restart: always
+    ports:
+      - "8001:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kanboard.entrypoints=websecure"
+      - "traefik.http.routers.kanboard.rule=Host(`tasks.${DOMAINNAME}`)"
+      - "traefik.http.routers.kanboard.tls.certresolver=cf-cert"
+      - "traefik.http.services.kanboard.loadbalancer.server.port=8001"
+    volumes:
+      - ${DOCKERDIR}/kanboard/data:/var/www/app/data
+      - ${DOCKERDIR}/kanboard/plugins:/var/www/app/plugins
+      - ${DOCKERDIR}/kanboard/ssl:/etc/nginx/ssl
+    networks:
+      - traefik_proxy
+
+  # Gitea - Lightweight git repository
+
   gitea:
     container_name: gitea
     image: gitea/gitea:latest
